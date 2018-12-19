@@ -12,7 +12,7 @@ def divideHalf(block):
     return left, right
 
 
-def devideKey(fullKey):
+def devideKeyIntoBytes(fullKey):
     subKeys = []
     for i in range(7, -1 , -1):
         subKeys.append((fullKey & (0xFF << 8 * i)) >> 8 * i)
@@ -34,7 +34,7 @@ def main():
     print('left: ', left, 'right: ',right)
 
     key = 0x133457799BBCDFF1
-    subKeys = devideKey(key)
+    subKeys = devideKeyIntoBytes(key)
     print('8-bit devided key:', subKeys)
 
     PC1 = [57, 49, 41, 33, 25, 17, 9, 1,
