@@ -4,15 +4,8 @@ All key-generator functions
 """
 
 
-def divideHalf(block):
-    # block = block[2:].zfill(64)
 
-    left = (block & 0xFFFFFFFF00000000) >> 32
-    right = block & 0x00000000FFFFFFFF
-    return left, right
-
-
-def devideKeyIntoBytes(fullKey):
+def divideKeyIntoBytes(fullKey):
     subKeys = []
     for i in range(7, -1 , -1):
         subKeys.append((fullKey & (0xFF << 8 * i)) >> 8 * i)
@@ -27,15 +20,24 @@ def permuteKey(key, PC1):
     return permutedKey
 
 
-def main():
-    plainTextBlock = 0x0123456789ABCDEF
-    print('plain text block:', plainTextBlock)
-    left, right = divideHalf(plainTextBlock)
-    print('left: ', left, 'right: ',right)
+def dividePermutedKey(permuted):
 
-    key = 0x133457799BBCDFF1
-    subKeys = devideKeyIntoBytes(key)
-    print('8-bit devided key:', subKeys)
+    left = (permuted & 0xFFFFFFF0000000) >> 28
+    right = permuted & 0x0000000FFFFFFFF
+    return left, right
+
+def bitLeftRoatate(key):
+    leftBit = (0x8000000 & key) >> 27
+    rotated = leftBit | (key << 1)
+    return rotated & 0xFFFFFFF
+
+
+
+def main():
+
+    # key = 0x133457799BBCDFF1
+    # subKeys = divideKeyIntoBytes(key)
+    # print('8-bit devided key:', subKeys)
 
     PC1 = [57, 49, 41, 33, 25, 17, 9, 1,
            58, 50, 42, 34, 26, 18, 10, 2,
@@ -46,6 +48,17 @@ def main():
            29, 21, 13, 5, 28, 20, 12, 4]
 
     key = 0x133457799BBCDFF1
-    print('permuted key:', permuteKey(0x133457799BBCDFF1, PC1))
+    permuted = permuteKey(key, PC1)
+    print('permuted key:', len(bin(permuted)[2:]))
+
+    c_0 = dividePermutedKey(permuted)[0]
+    d_0 = dividePermutedKey(permuted)[1]
+    print('C0: ', bin(c_0).zfill(28)[2:], ' D0: ', bin(d_0).zfill(28)[2:])
+
+    cNext = bitLeftRoatate(c_0)
+    for i in range (160):
+        print('Cn+1: ', bin(cNext)[2:].zfill(28))
+        cNext = bitLeftRoatate(cNext)
+
 
 main()
