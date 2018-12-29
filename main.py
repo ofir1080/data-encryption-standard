@@ -2,7 +2,6 @@
 """
 Implementation of DES (Data Encryption Standard) algorithm,
 one of the most famous algorithms for implementing symmetric cryptography in the world.
-https://en.wikipedia.org/wiki/Data_Encryption_Standard
 
 Modules:
 BlockGenerator applies bitwise operations on the given message (64-bit size)
@@ -13,9 +12,7 @@ Data the fixed data for implementing DES
 Aouthor: Ofir Abramovich
 """
 
-import BlockGenerator
-import KeyGenerator
-import MainFunc
+from modules import BlockGenerator, MainFunc, KeyGenerator
 import Data
 
 
@@ -29,6 +26,7 @@ def hashIt(msg, initialKey, encrypt):
     keySet = KeyGenerator.create_key(initialKey)    # returns a list of 16 keys
     left, right = BlockGenerator.divide_left_right(msg)  # return the first divided block
     # sets direction of the loop according to encryption/decryption
+
     if encrypt is True:
         strt = 0
         fin = 16
@@ -39,27 +37,6 @@ def hashIt(msg, initialKey, encrypt):
         dir = -1
 
     for i in range(strt, fin, dir):
-        left, right = MainFunc.get_new_left_right(left, right, keySet[i + 1])
-
-    reversed = (right << 32) | left  # 64 bit integer
-    finalCrypt = 0
-    for i, shifts in enumerate(Data.IPR):
-        dig = reversed >> (64 - shifts) & 1
-        finalCrypt |= dig << 63 - i
-    return finalCrypt
-
-
-def decrypt(encr, initialKey):
-    """
-    :param msg: 64-bit hash
-    :param initialKey: initial 64-bit key
-    :return: 64-big encryption
-    """
-
-    keySet = KeyGenerator.create_key(initialKey)    # returns a list of 16 keys
-
-    left, right = BlockGenerator.divide_left_right(encr)    # return the first divided block
-    for i in range(15, -1, -1):
         left, right = MainFunc.get_new_left_right(left, right, keySet[i + 1])
 
     reversed = (right << 32) | left  # 64 bit integer
