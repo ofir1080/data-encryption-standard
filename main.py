@@ -25,8 +25,8 @@ def hashIt(msg, initialKey, encrypt):
     """
     keySet = KeyGenerator.create_key(initialKey)    # returns a list of 16 keys
     left, right = BlockGenerator.divide_left_right(msg)  # return the first divided block
-    # sets direction of the loop according to encryption/decryption
 
+    # sets direction of the loop according to encryption/decryption
     if encrypt is True:
         strt = 0
         fin = 16
