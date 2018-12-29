@@ -1,31 +1,80 @@
+
+"""
+Implementation of DES (Data Encryption Standard) algorithm,
+one of the most famous algorithms for implementing symmetric cryptography in the world.
+https://en.wikipedia.org/wiki/Data_Encryption_Standard
+
+Modules:
+BlockGenerator applies bitwise operations on the given message (64-bit size)
+KeyGenerator generates 16 48-bit
+MainFunc does the actual hashing with the message and the keys
+Data the fixed data for implementing DES
+
+Aouthor: Ofir Abramovich
+"""
+
 import BlockGenerator
 import KeyGenerator
+import MainFunc
+import Data
 
 
-def hashing(right, key):
+def hashIt(msg, initialKey, encrypt):
+    """
+    :param msg: 64-bit message
+    :param initialKey: initial 64-bit key
+    :param encrypt: if set to true do encryption otherwise decryption
+    :return: 64-big encryption
+    """
+    keySet = KeyGenerator.create_key(initialKey)    # returns a list of 16 keys
+    left, right = BlockGenerator.divide_left_right(msg)  # return the first divided block
+    # sets direction of the loop according to encryption/decryption
+    if encrypt is True:
+        strt = 0
+        fin = 16
+        dir = 1
+    else:
+        strt = 15
+        fin = -1
+        dir = -1
 
-    E = [32, 1, 2, 3, 4, 5, 4, 5,
-          6, 7, 8, 9, 8, 9, 10, 11,
-         12, 13, 12, 13, 14, 15, 16,
-         17, 16, 17, 18, 19, 20, 21,
-         20, 21, 22, 23, 24, 25, 24,
-         25, 26, 27, 28, 29, 28, 29,
-         30, 31, 32, 1]
+    for i in range(strt, fin, dir):
+        left, right = MainFunc.get_new_left_right(left, right, keySet[i + 1])
 
-    expanded = 0
-    for i, num in enumerate(E):
-        bit = (right >> 32 - num) & 1
-        expanded |= (bit << 48 - i - 1)
-    return expanded;
+    reversed = (right << 32) | left  # 64 bit integer
+    finalCrypt = 0
+    for i, shifts in enumerate(Data.IPR):
+        dig = reversed >> (64 - shifts) & 1
+        finalCrypt |= dig << 63 - i
+    return finalCrypt
 
 
-# keys = KeyGenerator.createKey(0x133457799BBCDFF1)   # 64-bit initial key
-# left, right = BlockGenerator(81985529216486895)
+def decrypt(encr, initialKey):
+    """
+    :param msg: 64-bit hash
+    :param initialKey: initial 64-bit key
+    :return: 64-big encryption
+    """
 
-test = 4037734570
-res = hashing(test, 0)
-print(bin(res)[2:].zfill(48))
+    keySet = KeyGenerator.create_key(initialKey)    # returns a list of 16 keys
 
-# for i in range(1, 17):
-#     newLeft = right
-#     newRight = left ^ hashing(right, keys[i])
+    left, right = BlockGenerator.divide_left_right(encr)    # return the first divided block
+    for i in range(15, -1, -1):
+        left, right = MainFunc.get_new_left_right(left, right, keySet[i + 1])
+
+    reversed = (right << 32) | left  # 64 bit integer
+    finalCrypt = 0
+    for i, shifts in enumerate(Data.IPR):
+        dig = reversed >> (64 - shifts) & 1
+        finalCrypt |= dig << 63 - i
+    return finalCrypt
+
+
+# test for the message = 0x0321456789ABCDEF with key = 0x133457799BBCDFF1
+msg = 0x0321456789ABCDEF
+key = 0x133457799BBCDFF1
+encr = hashIt(msg, key, True)
+dcr = hashIt(encr, key, False)
+
+print('{:<35s}{:>20s}{:>20s}{:>20s}'.format('The encrypted form of the message:', hex(msg)[2:], 'is: ', hex(encr)[2:]))
+print('{:<35s}{:>20s}{:>20s}{:>20s}'.format('The decrypted form of the hash:', hex(encr)[2:], 'is: ', hex(dcr)[2:]))
