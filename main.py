@@ -50,8 +50,9 @@ def hashIt(msg, initialKey, encrypt):
 # test for the message = 0x0321456789ABCDEF with key = 0x133457799BBCDFF1
 msg = 0x0321456789ABCDEF
 key = 0x133457799BBCDFF1
+
 encr = hashIt(msg, key, True)
 dcr = hashIt(encr, key, False)
-
-print('{:<35s}{:>20s}{:>20s}{:>20s}'.format('The encrypted form of the message:', hex(msg)[2:], 'is: ', hex(encr)[2:]))
-print('{:<35s}{:>20s}{:>20s}{:>20s}'.format('The decrypted form of the hash:', hex(encr)[2:], 'is: ', hex(dcr)[2:]))
+print('encryption key: 0321456789Aabcdf')
+print((hex(msg)[2:] + ' --encrypt--> ' + hex(encr)[2:]))
+print(hex(dcr)[2:] + ' <--decrypt-- ' + hex(encr)[2:])
