@@ -9,5 +9,5 @@ As of now, this implementaion takes only a 64-bit maximun message.
 ## References
 http://page.math.tu-berlin.de/~kant/teaching/hess/krypto-ws2006/des.htm
 
-## Auther
+## Author
 Ofir Abramoviuch
